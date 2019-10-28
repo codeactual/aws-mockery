@@ -1,0 +1,10 @@
+**/testdata/dynamic
+**/testdata/cover/*.html
+**/testdata/dynamic
+*.log
+/aws-sdk-go-master
+/build
+/master.zip
+/mocks
+core
+cover.out

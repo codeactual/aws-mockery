@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -euxo pipefail
+
+filedir="$(dirname "$(readlink -f "$0")")"
+outdir="${filedir}/../dynamic/integration"
+
+# Assert basic mock generation
+
+rm -rf "${outdir}"
+mkdir -p "${outdir}"
+curl --location --show-error --silent --output "${outdir}/master.zip" https://github.com/aws/aws-sdk-go/archive/master.zip
+unzip -q -d "${outdir}" "${outdir}/master.zip"
+./build/aws-mockery --out-dir "${outdir}/mocks" --sdk-dir "${outdir}/aws-sdk-go-master" --service=s3,sns
+ls -la "${outdir}/mocks"
+grep -n s3iface.S3API "${outdir}/mocks/s3.go"
+grep -n snsiface.SNSAPI "${outdir}/mocks/sns.go"
+
+# Assert 1.11+ modules compatibility
+
+gomodfuzz -v --log-file "${outdir}/log" -- "${outdir}/../../../build/aws-mockery" --out-dir "${outdir}/mocks" --sdk-dir "${outdir}/aws-sdk-go-master" --service=s3,sns
