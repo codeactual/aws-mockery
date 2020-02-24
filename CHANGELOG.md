@@ -2,8 +2,10 @@
 
 ## v0.1.3
 
-> This release updates several first/third-party dependencies.
+> This release fixes a bug preventing its use in Go 1.13 when vendoring is enabled. It also updates several first/third-party dependencies.
 
+- fix
+  - "Unable to find X in any go files under Y" errors when `GOFLAGS=-mod=vendor` is set in Go 1.13.
 - feat
   - --version now prints details about the build's paths and modules.
 - notable dependency changes

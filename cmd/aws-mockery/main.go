@@ -45,6 +45,7 @@ import (
 const (
 	newFilePerm = 0666 // Match os.Create for use with ioutil.WriteFile
 	newDirPerm  = 0755
+	vendorFlag  = "-mod=vendor"
 )
 
 // serviceName holds purpose-specific AWS service names collected from the aws-sdk-go
@@ -119,33 +120,36 @@ func (h *Handler) BindFlags(cmd *cobra.Command) []string {
 func (h *Handler) Run(ctx context.Context, input handler.Input) {
 	h.serviceDir = filepath.Join(h.SdkDir, "service")
 
-	// Improve 1.11+ modules support consistence with predictable working directories and absolute paths.
+	// Compatibility fix: Avoid errors like "Unable to find S3API in any go files under (--sdk-dir value)"
+	// that started to occur in Go 1.13 when vendoring is enabled. Even if the interface
+	// declaration in the directory, the error still happens.
 	//
-	// Working directories
-	//
-	// For example, in x/tools/go/packages query results can depend on both the working directory
-	// (e.g. if it's in a module/GOPATH or not, etc.) and the file/dir/import-path queried.
-	// Here we remove the former variable from permutations because the working directory should not effect
-	// the files generated.
-	//
-	// **Absolute paths**
-	//
-	// Prevent x/tools/go/packages queries for file/dir paths from being proessed as as import paths.
-	//
-	// **Non-module, non-vendor, non-GOPATH --sdk-dir locations**
-	//
-	// If the "aws-sdk-go/go.mod" does not exist, temporarily create it as a hack for the Go toolchain
-	// to process it as a module.
+	// Since vendoring isn't relevant to this tool anyway, due to how the SDK dir location is a
+	// required input, we just disable vendoring for the process to work around that error.
+	if goflags := os.Getenv("GOFLAGS"); strings.Contains(goflags, vendorFlag) {
+		if err := os.Setenv("GOFLAGS", strings.Replace(goflags, vendorFlag, "", 1)); err != nil {
+			h.Log.ExitOnErr(1, errors.Wrap(err, "failed to set GOFLAGS w/o vendor flag"))
+		}
+	}
+
+	// Compatibility fix: convert relative paths to absolute paths (in place) to prevent x/tools/go/packages
+	// queries for file/dir paths from being proessed as as import paths.
 	h.Log.ExitOnErr(1, cage_filepath.Abs(&h.serviceDir))
 	h.Log.ExitOnErr(1, cage_filepath.Abs(&h.OutDir))
+
 	exists, _, existsErr := cage_file.Exists(h.SdkDir)
 	h.Log.ExitOnErr(1, existsErr)
 	if !exists {
 		h.Exitf(1, "--service selection [%s] not found", h.SdkDir)
 	}
+
 	tmpGomodPath := filepath.Join(h.SdkDir, "go.mod")
+
 	exists, _, existsErr = cage_file.Exists(tmpGomodPath)
 	h.Log.ExitOnErr(1, existsErr)
+
+	// Compatibility fix: if the "aws-sdk-go/go.mod" does not exist, temporarily create it as a hack
+	// to avoid Go toolchain errors expected when --sdk-dir is, for example, not inside a module.
 	if !exists {
 		gomodFile, createErr := os.Create(tmpGomodPath)
 		h.Log.ExitOnErr(1, createErr)
@@ -203,23 +207,12 @@ func (h *Handler) addMockClients(services []serviceName) (err error) {
 }
 
 func (h *Handler) addMockClient(svc serviceName, ifaceDir, outFileName, outPkgName string) error {
-	// Improve 1.11+ modules support consistence with predictable working directories and absolute paths.
-	//
-	// **Working directories**
+	// Compatibility fix: Always change the working directory to the interface file's directory.
 	//
 	// For example, in x/tools/go/packages query results can depend on both the working directory
 	// (e.g. if it's in a module/GOPATH or not, etc.) and the file/dir/import-path queried.
 	// Here we remove the former variable from permutations because the working directory should not effect
 	// the files generated.
-	//
-	// Absolute paths
-	//
-	// Prevent x/tools/go/packages queries for file/dir paths from being proessed as as import paths.
-	//
-	// Non-module, non-vendor, non-GOPATH --sdk-dir locations
-	//
-	// If the "aws-sdk-go/go.mod" does not exist, temporarily create it as a hack for the Go toolchain
-	// to process it as a module.
 	if err := os.Chdir(ifaceDir); err != nil {
 		return errors.Wrapf(err, "failed to change working directory to [%s]", ifaceDir)
 	}
