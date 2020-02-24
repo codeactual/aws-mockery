@@ -78,7 +78,6 @@ type Handler struct {
 
 	OutDir   string `usage:""`
 	SdkDir   string `usage:""`
-	SdkVer   string `usage:"1 or 2"`
 	Services string `usage:"Comma-separated list of service IDs (SDK dir names under service/)"`
 
 	Log *log_zap.Mixin
@@ -110,7 +109,6 @@ func (h *Handler) Init() handler_cobra.Init {
 func (h *Handler) BindFlags(cmd *cobra.Command) []string {
 	cmd.Flags().StringVarP(&h.OutDir, "out-dir", "", "", cage_reflect.GetFieldTag(*h, "OutDir", "usage"))
 	cmd.Flags().StringVarP(&h.SdkDir, "sdk-dir", "", "", cage_reflect.GetFieldTag(*h, "SdkDir", "usage"))
-	cmd.Flags().StringVarP(&h.SdkVer, "sdk-ver", "", "1", cage_reflect.GetFieldTag(*h, "SdkVer", "usage"))
 	cmd.Flags().StringVarP(&h.Services, "service", "", "", cage_reflect.GetFieldTag(*h, "Services", "usage"))
 	return []string{"out-dir", "sdk-dir", "service"}
 }
