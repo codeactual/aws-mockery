@@ -16,7 +16,7 @@ script:
   # Assert compilation
   - make build
   # Assert test suite
-  - make test-dep test
+  - travis_wait make test-dep test
   - stat ./testdata/dynamic/integration/log > /dev/null 2>&1 && cat ./testdata/dynamic/integration/log
   # Assert "go get" accessible
   - mkdir $HOME/go_get_test

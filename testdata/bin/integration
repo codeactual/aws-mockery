@@ -18,19 +18,4 @@ grep -n snsiface.SNSAPI "${outdir}/mocks/sns.go"
 
 # Assert 1.11+ modules compatibility
 
-FUZZ_ARGS=(
-  gomodfuzz
-  -v
-  --log-file "${outdir}/log"
-  --
-  "${outdir}/../../../build/aws-mockery"
-  --out-dir "${outdir}/mocks"
-  --sdk-dir "${outdir}/aws-sdk-go-master"
-  --service=s3,sns
-)
-
-if [ -n "${TRAVIS_COMMIT-}" ]; then
-  travis_wait "${FUZZ_ARGS[@]}"
-else
-  "${FUZZ_ARGS[@]}"
-fi
+gomodfuzz -v --log-file "${outdir}/log" -- "${outdir}/../../../build/aws-mockery" --out-dir "${outdir}/mocks" --sdk-dir "${outdir}/aws-sdk-go-master" --service=s3,sns
