@@ -82,4 +82,4 @@ github.com/codeactual/aws-mockery/internal/cage/strings/strings.go		StringKeyPtr
 github.com/codeactual/aws-mockery/internal/cage/strings/strings.go		truncate		100.0%
 github.com/codeactual/aws-mockery/internal/cage/strings/strings.go		TruncateAppendHint	100.0%
 github.com/codeactual/aws-mockery/internal/cage/strings/strings.go		TruncatePrependHint	100.0%
-70.6%
+67.7%

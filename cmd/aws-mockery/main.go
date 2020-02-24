@@ -64,7 +64,9 @@ type serviceName struct {
 }
 
 func main() {
-	err := handler_cobra.NewHandler(&Handler{}).Execute()
+	err := handler_cobra.NewHandler(&Handler{
+		Session: &handler.DefaultSession{},
+	}).Execute()
 	if err != nil {
 		panic(errors.WithStack(err))
 	}
@@ -72,7 +74,7 @@ func main() {
 
 // Handler defines the sub-command flags and logic.
 type Handler struct {
-	handler.IO
+	handler.Session
 
 	OutDir   string `usage:""`
 	SdkDir   string `usage:""`
@@ -116,7 +118,7 @@ func (h *Handler) BindFlags(cmd *cobra.Command) []string {
 // Run performs the sub-command logic.
 //
 // It implements cli/handler/cobra.Handler.
-func (h *Handler) Run(ctx context.Context, args []string) {
+func (h *Handler) Run(ctx context.Context, input handler.Input) {
 	h.serviceDir = filepath.Join(h.SdkDir, "service")
 
 	// Improve 1.11+ modules support consistence with predictable working directories and absolute paths.
@@ -162,7 +164,7 @@ func (h *Handler) Run(ctx context.Context, args []string) {
 
 	svcIds := cage_strings.Split(h.Services, ",")
 	if len(svcIds) == 0 {
-		h.Exit(1, "no --service selected")
+		h.Exitf(1, "no --service selected")
 	}
 
 	availServices, err := h.getAvailServices()

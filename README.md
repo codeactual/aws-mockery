@@ -1,4 +1,4 @@
-# aws-mockery [![GoDoc](https://godoc.org/github.com/codeactual/aws-mockery?status.svg)](https://godoc.org/github.com/codeactual/aws-mockery) [![Go Report Card](https://goreportcard.com/badge/github.com/codeactual/aws-mockery)](https://goreportcard.com/report/github.com/codeactual/aws-mockery) [![Build Status](https://travis-ci.org/codeactual/aws-mockery.png)](https://travis-ci.org/codeactual/aws-mockery)
+# aws-mockery [![GoDoc](https://godoc.org/github.com/codeactual/aws-mockery?status.svg)](https://pkg.go.dev/mod/github.com/codeactual/aws-mockery) [![Go Report Card](https://goreportcard.com/badge/github.com/codeactual/aws-mockery)](https://goreportcard.com/report/github.com/codeactual/aws-mockery) [![Build Status](https://travis-ci.org/codeactual/aws-mockery.png)](https://travis-ci.org/codeactual/aws-mockery)
 
 aws-mockery is a program which uses the [mockery](https://github.com/vektra/mockery) API to generate implementations of selected [aws-sdk-go](https://github.com/aws/aws-sdk-go) service interfaces.
 
@@ -28,8 +28,13 @@ aws-mockery --out-dir /path/to/mocks --sdk-dir /path/to/github.com/aws/aws-sdk-g
 
 - `--service` expects a comma-separated list of identifiers, e.g. `ec2`, which must be a directory name from the SDK's [service](https://github.com/aws/aws-sdk-go/tree/master/service) directory.
 
-# License
+# Development
+
+## License
 
 [Mozilla Public License Version 2.0](https://www.mozilla.org/en-US/MPL/2.0/) ([About](https://www.mozilla.org/en-US/MPL/), [FAQ](https://www.mozilla.org/en-US/MPL/2.0/FAQ/))
 
-*(Exported from a private monorepo with [transplant](https://github.com/codeactual/transplant).)*
+## Contributing
+
+- Please feel free to submit issues, PRs, questions, and feedback.
+- Although this repository consists of snapshots extracted from a private monorepo using [transplant](https://github.com/codeactual/transplant), PRs are welcome. Standard GitHub workflows are still used.

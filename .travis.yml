@@ -23,7 +23,7 @@ script:
   - cd $HOME/go_get_test
   - go mod init go_get_test
   - 'go get -v github.com/codeactual/aws-mockery/cmd/aws-mockery@${TRAVIS_COMMIT}'
-  - aws-mockery --help
+  - aws-mockery --version
   # Attempt to invalidate Github's cached badge images
   - curl --location --show-error --silent --output hub-purge.sh https://raw.githubusercontent.com/codeactual/hub-purge/master/hub-purge.sh
   - chmod +x ./hub-purge.sh

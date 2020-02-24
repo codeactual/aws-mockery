@@ -73,7 +73,7 @@ func Run(c Config) (string, error) {
 				return "", errors.Wrap(updateErr, "failed to enable vendoring in GOFLAGS")
 			}
 			defer func() {
-				if restoreErr := os.Setenv("GOFLAGS", "on"); restoreErr != nil {
+				if restoreErr := os.Setenv("GOFLAGS", origGoflags); restoreErr != nil {
 					fmt.Fprintf(os.Stderr, "failed to restore GOFLAGS value to [%s]: %+v\n", origGoflags, restoreErr)
 				}
 			}()
